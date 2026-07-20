@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Bring up the simulated in-car Ethernet segment:
 #
-#   netns lidar (192.168.10.11) --veth--\                 /--veth-- netns steering (192.168.10.12)
+#   netns lidar (192.168.10.13) --veth--\                 /--veth-- netns steering (192.168.10.14)
 #                                        [ br0 : OVS switch, VLAN 10 ]
 #                                                 |
 #                                               mon0  (SPAN: copy of ALL traffic -> Wireshark)
