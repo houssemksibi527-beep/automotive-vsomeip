@@ -1,0 +1,5 @@
+# These run inside WSL2 Ubuntu — force LF so bash never sees CRLF.
+*.sh    text eol=lf
+*.hpp   text eol=lf
+*.cpp   text eol=lf
+*.json  text eol=lf

@@ -1,0 +1,22 @@
+# Wireshark captures
+captures/
+*.pcap
+*.pcapng
+
+# vsomeip upstream clone + its build output (fetched by 00-build.sh)
+vsomeip/vsomeip/
+
+# app build output
+vsomeip/build/
+**/build/
+
+# UI (Next.js)
+/node_modules/
+ui/node_modules/
+ui/.next/
+ui/next-env.d.ts
+ui/tsconfig.tsbuildinfo
+
+# editor / OS cruft
+*.swp
+.DS_Store

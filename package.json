@@ -1,0 +1,9 @@
+{
+  "name": "automotive-someip-rig",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Run the whole rig from one command: npm run dev",
+  "scripts": {
+    "dev": "bash ui/scripts/dev.sh"
+  }
+}
