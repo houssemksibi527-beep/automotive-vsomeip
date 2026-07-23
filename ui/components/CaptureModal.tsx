@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Packet, LIDAR_IP, STEER_IP } from "./types";
+import { Packet, IVI_IP, HPC_IP } from "./types";
 
 function rowClass(proto: string) {
   if (proto.includes("SOME/IP-SD")) return "row-sd";
@@ -10,8 +10,8 @@ function rowClass(proto: string) {
 }
 
 function nameFor(ip: string) {
-  if (ip === LIDAR_IP) return "LIDAR";
-  if (ip === STEER_IP) return "Steering";
+  if (ip === IVI_IP) return "IVI";
+  if (ip === HPC_IP) return "HPC";
   if (ip.startsWith("224.")) return "multicast";
   return "";
 }
@@ -107,7 +107,7 @@ export default function CaptureModal({
               {rows.length === 0 && (
                 <tr>
                   <td colSpan={7} className="p-6 text-center text-ink-soft">
-                    Waiting for packets… start LIDAR and steering to see SOME/IP traffic cross the switch.
+                    Waiting for packets… start IVI and HPC to see SOME/IP traffic cross the switch.
                   </td>
                 </tr>
               )}
@@ -162,7 +162,7 @@ function Endpoint({ ip }: { ip: string }) {
   const name = nameFor(ip);
   return (
     <span>
-      <span className={ip === LIDAR_IP ? "text-green-deep" : ip === STEER_IP ? "text-blue" : "text-ink-soft"}>{ip || "—"}</span>
+      <span className={ip === IVI_IP ? "text-green-deep" : ip === HPC_IP ? "text-blue" : "text-ink-soft"}>{ip || "—"}</span>
       {name && <span className="ml-1 text-[10px] font-bold text-ink-soft">{name}</span>}
     </span>
   );
