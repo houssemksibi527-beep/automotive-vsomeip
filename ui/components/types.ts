@@ -13,6 +13,6 @@ export type Packet = {
   error?: string;
 };
 
-export const IVI_IP = "192.168.10.11";
-export const HPC_IP = "192.168.10.12";
+export const IVI_IP = "192.168.10.13";
+export const HPC_IP = "192.168.10.14";
 export const SD_MCAST = "224.244.224.245";
