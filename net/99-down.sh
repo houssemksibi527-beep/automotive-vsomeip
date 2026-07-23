@@ -13,9 +13,9 @@ fi
 
 ovs-vsctl --if-exists clear bridge "$BR" mirrors
 ovs-vsctl --if-exists del-br "$BR"
-ip netns del "$LIDAR_NS" 2>/dev/null || true
-ip netns del "$STEER_NS" 2>/dev/null || true
-ip link del "$LIDAR_OVS" 2>/dev/null || true
-ip link del "$STEER_OVS" 2>/dev/null || true
+ip netns del "$IVI_NS" 2>/dev/null || true
+ip netns del "$HPC_NS" 2>/dev/null || true
+ip link del "$IVI_OVS" 2>/dev/null || true
+ip link del "$HPC_OVS" 2>/dev/null || true
 
 echo "Segment torn down."
