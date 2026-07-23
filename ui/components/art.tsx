@@ -3,76 +3,68 @@
 
 const INK = "#0E1F3A";
 
-export function LidarArt({ active }: { active: boolean }) {
+export function IVIArt({ active }: { active: boolean }) {
   const accent = active ? "#1FBD55" : "#C7D0DD";
   return (
     <g>
-      <defs>
-        <linearGradient id="lidarSweep" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#2FCB66" stopOpacity="0.85" />
-          <stop offset="100%" stopColor="#2FCB66" stopOpacity="0" />
-        </linearGradient>
-      </defs>
+      {/* Outer Screen Bezel */}
+      <rect x={-72} y={-48} width={144} height={96} rx={12} fill="#FFFFFF" stroke={INK} strokeWidth={8} />
+      
+      {/* Inner Screen Display */}
+      <rect x={-60} y={-36} width={120} height={72} rx={6} fill={active ? "#E8F9EE" : "#F8F9FB"} stroke="#EEF1F6" strokeWidth={2} />
 
+      {/* Dashboard UI Elements - App Grid & Media Player */}
+      <rect x={-48} y={-24} width={40} height={48} rx={6} fill={accent} />
+      <rect x={-2} y={-24} width={50} height={20} rx={4} fill={accent} opacity={0.5} />
+      <rect x={-2} y={4} width={50} height={20} rx={4} fill={accent} opacity={0.8} />
+
+      {/* Active Pulse Animation inside the UI */}
       {active && (
-        <circle r={58} fill="none" stroke="#1FBD55" strokeWidth={3}>
-          <animate attributeName="r" from={56} to={104} dur="2.6s" repeatCount="indefinite" />
-          <animate attributeName="opacity" from={0.5} to={0} dur="2.6s" repeatCount="indefinite" />
+        <circle cx={-28} cy={0} r={10} fill="#FFFFFF">
+          <animate attributeName="opacity" values="0.1;0.9;0.1" dur="2s" repeatCount="indefinite" />
         </circle>
       )}
-
-      {/* base puck */}
-      <circle r={56} fill="#FFFFFF" stroke={INK} strokeWidth={8} />
-      <circle r={44} fill="#F8F9FB" stroke="#EEF1F6" strokeWidth={2} />
-
-      {/* rotating sweep */}
-      <g>
-        <path d="M0 0 L0 -46 A46 46 0 0 1 40 -23 Z" fill="url(#lidarSweep)">
-          {active && (
-            <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="2.8s" repeatCount="indefinite" />
-          )}
-        </path>
-      </g>
-
-      {/* beam ticks */}
-      {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => {
-        const r = (a * Math.PI) / 180;
-        return <circle key={a} cx={Math.cos(r) * 46} cy={Math.sin(r) * 46} r={2.6} fill={accent} />;
-      })}
-
-      {/* hub */}
-      <circle r={9} fill={accent} stroke={INK} strokeWidth={3} />
     </g>
   );
 }
 
-export function SteeringArt({ active }: { active: boolean }) {
+export function HPCArt({ active }: { active: boolean }) {
   const accent = active ? "#3D4FE5" : "#C7D0DD";
-  const spokes = [90, 210, 330];
   return (
     <g>
-      <g>
-        {active && (
-          <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="-360 0 0" dur="7s" repeatCount="indefinite" />
-        )}
-        {/* rim */}
-        <circle r={56} fill="#FFFFFF" stroke={INK} strokeWidth={10} />
-        <circle r={40} fill="none" stroke="#EEF1F6" strokeWidth={4} />
-        {/* spokes */}
-        {spokes.map((a) => {
-          const r = (a * Math.PI) / 180;
-          return (
-            <line key={a} x1={0} y1={0} x2={Math.cos(r) * 50} y2={Math.sin(r) * 50} stroke={INK} strokeWidth={9} strokeLinecap="round" />
-          );
-        })}
-        {/* grip nubs */}
-        {[30, 150, 270].map((a) => {
-          const r = (a * Math.PI) / 180;
-          return <circle key={a} cx={Math.cos(r) * 56} cy={Math.sin(r) * 56} r={6} fill={accent} />;
-        })}
-        {/* hub */}
-        <circle r={16} fill={accent} stroke={INK} strokeWidth={4} />
-      </g>
+      {/* External Pins (Microcontroller/ECU style) */}
+      {[-32, -12, 8, 28].map((pos) => (
+        <g key={pos}>
+          {/* Top */}
+          <line x1={pos + 2} y1={-52} x2={pos + 2} y2={-64} stroke={INK} strokeWidth={6} strokeLinecap="round" />
+          {/* Bottom */}
+          <line x1={pos + 2} y1={52} x2={pos + 2} y2={64} stroke={INK} strokeWidth={6} strokeLinecap="round" />
+          {/* Left */}
+          <line x1={-52} y1={pos + 2} x2={-64} y2={pos + 2} stroke={INK} strokeWidth={6} strokeLinecap="round" />
+          {/* Right */}
+          <line x1={52} y1={pos + 2} x2={64} y2={pos + 2} stroke={INK} strokeWidth={6} strokeLinecap="round" />
+        </g>
+      ))}
+
+      {/* Main CPU / ECU Housing */}
+      <rect x={-52} y={-52} width={104} height={104} rx={16} fill="#FFFFFF" stroke={INK} strokeWidth={8} />
+      
+      {/* Inner Chip Die */}
+      <rect x={-28} y={-28} width={56} height={56} rx={8} fill={active ? "#EEF1FF" : "#F8F9FB"} stroke="#EEF1F6" strokeWidth={2} />
+
+      {/* Center Core */}
+      <circle cx={0} cy={0} r={12} fill={accent} />
+
+      {/* Data Lines / Traces connecting to the core */}
+      <path d="M-14 -14 L-6 -6 M14 -14 L6 -6 M-14 14 L-6 6 M14 14 L6 6" stroke={accent} strokeWidth={4} strokeLinecap="round" />
+
+      {/* Active Processing Ripple */}
+      {active && (
+        <circle cx={0} cy={0} r={12} fill="none" stroke={accent} strokeWidth={3}>
+          <animate attributeName="r" from={12} to={26} dur="1.2s" repeatCount="indefinite" />
+          <animate attributeName="opacity" from={0.8} to={0} dur="1.2s" repeatCount="indefinite" />
+        </circle>
+      )}
     </g>
   );
 }
