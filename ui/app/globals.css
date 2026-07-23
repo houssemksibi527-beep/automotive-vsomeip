@@ -89,7 +89,7 @@
   }
 }
 
-/* LIDAR sweep + steering wheel + running rings */
+/* IVI + HPC + running rings animations */
 @keyframes spin-cw { to { transform: rotate(360deg); } }
 @keyframes spin-ccw { to { transform: rotate(-360deg); } }
 @keyframes pulse-ring {
