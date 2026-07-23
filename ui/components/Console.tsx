@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Status, DeviceId, Packet, LIDAR_IP, STEER_IP, SD_MCAST } from "./types";
+import { Status, DeviceId, Packet, IVI_IP, HPC_IP, SD_MCAST } from "./types";
 import CaptureModal from "./CaptureModal";
 import { LidarArt, SteeringArt, SwitchArt } from "./art";
 
 type Dot = { id: number; x0: number; x1: number; color: string };
 
-const X = { lidar: 17, sw: 50, steering: 83 } as const;
+const X = { ivi: 17, sw: 50, hpc: 83 } as const;
 const WIRE_Y = 40;
 
 async function postJSON(url: string, body: unknown): Promise<Status | null> {
@@ -22,7 +22,7 @@ async function postJSON(url: string, body: unknown): Promise<Status | null> {
 export default function Console() {
   const [status, setStatus] = useState<Status | null>(null);
   const [busy, setBusy] = useState<Record<string, boolean>>({});
-  const [logs, setLogs] = useState<Record<DeviceId, string[]>>({ lidar: [], steering: [] });
+  const [logs, setLogs] = useState<Record<DeviceId, string[]>>({ ivi: [], hpc: [] });
   const [selected, setSelected] = useState<DeviceId | null>(null);
   const [hovered, setHovered] = useState<DeviceId | "switch" | null>(null);
   const [captureOpen, setCaptureOpen] = useState(false);
@@ -64,13 +64,13 @@ export default function Console() {
       : "var(--neutral-300)";
     const add: Dot[] = [];
     const mk = (x0: number, x1: number) => add.push({ id: ++dotSeq.current, x0, x1, color });
-    if (p.src === LIDAR_IP) mk(X.lidar, X.sw);
-    if (p.src === STEER_IP) mk(X.steering, X.sw);
-    if (p.dst === LIDAR_IP) mk(X.sw, X.lidar);
-    if (p.dst === STEER_IP) mk(X.sw, X.steering);
+    if (p.src === IVI_IP) mk(X.ivi, X.sw);
+    if (p.src === HPC_IP) mk(X.hpc, X.sw);
+    if (p.dst === IVI_IP) mk(X.sw, X.ivi);
+    if (p.dst === HPC_IP) mk(X.sw, X.hpc);
     if (p.dst === SD_MCAST) {
-      if (p.src === LIDAR_IP) mk(X.sw, X.steering);
-      if (p.src === STEER_IP) mk(X.sw, X.lidar);
+      if (p.src === IVI_IP) mk(X.sw, X.hpc);
+      if (p.src === HPC_IP) mk(X.sw, X.ivi);
     }
     if (add.length) setDots((d) => [...d, ...add].slice(-48));
   }, []);
@@ -104,7 +104,7 @@ export default function Console() {
 
   // ---- per-device log streams (open while running) -------------------------
   useEffect(() => {
-    (["lidar", "steering"] as DeviceId[]).forEach((d) => {
+    (["ivi", "hpc"] as DeviceId[]).forEach((d) => {
       const running = status?.[d];
       if (running && !logES.current[d]) {
         const es = new EventSource(`/api/logs?device=${d}`);
@@ -125,7 +125,7 @@ export default function Console() {
         delete logES.current[d];
       }
     });
-  }, [status?.lidar, status?.steering]);
+  }, [status?.ivi, status?.hpc]);
 
   // ---- controls -------------------------------------------------------------
   const applyStatus = (s: Status | null) => {
@@ -145,7 +145,7 @@ export default function Console() {
     setBusy((b) => ({ ...b, [d]: false }));
   };
 
-  const s = status ?? { switch: false, lidar: false, steering: false };
+  const s = status ?? { switch: false, ivi: false, hpc: false };
   const wireActive = (d: DeviceId) => s.switch && s[d];
 
   return (
@@ -158,10 +158,10 @@ export default function Console() {
           <div className="relative w-full" style={{ aspectRatio: "1000 / 500" }}>
             {/* wires + nodes */}
             <svg viewBox="0 0 1000 500" className="absolute inset-0 h-full w-full" aria-hidden>
-              <Wire x1={170} x2={500} active={wireActive("lidar")} />
-              <Wire x1={500} x2={830} active={wireActive("steering")} />
+              <Wire x1={170} x2={500} active={wireActive("ivi")} />
+              <Wire x1={500} x2={830} active={wireActive("hpc")} />
               <g transform="translate(170,200)">
-                <LidarArt active={s.lidar} />
+                <LidarArt active={s.ivi} />
               </g>
               <g
                 transform="translate(500,200)"
@@ -171,14 +171,14 @@ export default function Console() {
                 <SwitchArt active={s.switch} />
               </g>
               <g transform="translate(830,200)">
-                <SteeringArt active={s.steering} />
+                <SteeringArt active={s.hpc} />
               </g>
             </svg>
 
             {/* HTML overlay: hit-areas, dots, buttons, popovers */}
             <div className="absolute inset-0">
               {/* hover hit-areas over each node */}
-              {(["lidar", "switch", "steering"] as const).map((k) => (
+              {(["ivi", "switch", "hpc"] as const).map((k) => (
                 <div
                   key={k}
                   className="absolute -translate-x-1/2 -translate-y-1/2"
@@ -213,20 +213,20 @@ export default function Console() {
 
               {/* popover: live actions on hover */}
               {hovered && hovered !== "switch" && (
-                <Popover x={X[hovered]} title={hovered === "lidar" ? "LIDAR" : "Steering"} lines={logs[hovered].slice(-4)} running={s[hovered]} />
+                <Popover x={X[hovered]} title={hovered === "ivi" ? "IVI" : "HPC"} lines={logs[hovered].slice(-4)} running={s[hovered]} />
               )}
               {hovered === "switch" && <SwitchPopover x={X.sw} up={s.switch} count={packets.length} />}
 
               {/* control buttons under each node */}
               <NodeControls
-                x={X.lidar}
-                label="LIDAR"
-                ip={LIDAR_IP}
-                on={s.lidar}
+                x={X.ivi}
+                label="IVI"
+                ip={IVI_IP}
+                on={s.ivi}
                 disabled={!s.switch}
-                busy={!!busy.lidar}
-                onToggle={() => toggleDevice("lidar")}
-                onInspect={() => setSelected("lidar")}
+                busy={!!busy.ivi}
+                onToggle={() => toggleDevice("ivi")}
+                onInspect={() => setSelected("ivi")}
               />
               <NodeControls
                 x={X.sw}
@@ -240,14 +240,14 @@ export default function Console() {
                 isSwitch
               />
               <NodeControls
-                x={X.steering}
-                label="Steering"
-                ip={STEER_IP}
-                on={s.steering}
+                x={X.hpc}
+                label="HPC"
+                ip={HPC_IP}
+                on={s.hpc}
                 disabled={!s.switch}
-                busy={!!busy.steering}
-                onToggle={() => toggleDevice("steering")}
-                onInspect={() => setSelected("steering")}
+                busy={!!busy.hpc}
+                onToggle={() => toggleDevice("hpc")}
+                onInspect={() => setSelected("hpc")}
               />
             </div>
           </div>
@@ -277,7 +277,7 @@ export default function Console() {
 /* ------------------------------------------------------------------ pieces */
 
 function Header({ status, onOpenCapture }: { status: Status | null; onOpenCapture: () => void }) {
-  const s = status ?? { switch: false, lidar: false, steering: false };
+  const s = status ?? { switch: false, ivi: false, hpc: false };
   return (
     <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
@@ -289,13 +289,13 @@ function Header({ status, onOpenCapture }: { status: Status | null; onOpenCaptur
           In-car <span style={{ color: "var(--blue)" }}>SOME/IP</span> rig
         </h1>
         <p className="mt-2 max-w-xl font-semibold text-ink-soft">
-          LIDAR and steering, two ECUs on one VLAN, talking only through the switch. Drive it all from here.
+          IVI and HPC, two ECUs on one VLAN, talking only through the switch. Drive it all from here.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
         <StatePill label="Switch" on={s.switch} />
-        <StatePill label="LIDAR" on={s.lidar} />
-        <StatePill label="Steering" on={s.steering} />
+        <StatePill label="IVI" on={s.ivi} />
+        <StatePill label="HPC" on={s.hpc} />
       </div>
     </header>
   );
@@ -414,7 +414,7 @@ function SwitchPopover({ x, up, count }: { x: number; up: boolean; count: number
 function Legend() {
   const items = [
     ["SOME/IP-SD", "var(--yellow)", "Service Discovery — Offer / Subscribe / Ack (the ECUs finding each other)"],
-    ["SOME/IP event", "var(--blue)", "LIDAR obstacle-distance notifications — the actual payload"],
+    ["SOME/IP event", "var(--blue)", "IVI / HPC communication notifications — the actual payload"],
     ["ARP", "var(--orange)", "MAC-address lookups (who-has)"],
     ["other", "var(--neutral-300)", "IGMP joins, plain UDP, anything else"],
   ] as const;
@@ -447,7 +447,7 @@ function ActionsPanel({ device, running, lines, onClose }: { device: DeviceId; r
     <div className="card mt-6 p-5 animate-fade-up">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-extrabold">{device === "lidar" ? "LIDAR" : "Steering"} — actions</h2>
+          <h2 className="text-xl font-extrabold">{device === "ivi" ? "IVI" : "HPC"} — actions</h2>
           <span className="pill" style={{ background: running ? "var(--green)" : "var(--neutral-100)", color: running ? "#fff" : "var(--ink-soft)" }}>
             {running ? "live" : "idle"}
           </span>
