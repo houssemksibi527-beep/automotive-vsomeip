@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Mulish, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-// Mulish = the zelos display/body face. JetBrains Mono for the packet table.
+// Mulish = display/body face. JetBrains Mono for the packet table.
 const mulish = Mulish({
   weight: ["600", "700", "800", "900"],
   style: ["normal", "italic"],
@@ -19,7 +19,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rig Console — LIDAR · Switch · Steering",
+  title: "Rig Console — IVI · Switch · HPC",
   description: "Control and observe the in-car SOME/IP Ethernet rig.",
 };
 
