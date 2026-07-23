@@ -1,6 +1,6 @@
-export type Status = { switch: boolean; lidar: boolean; steering: boolean };
+export type Status = { switch: boolean; ivi: boolean; hpc: boolean };
 
-export type DeviceId = "lidar" | "steering";
+export type DeviceId = "ivi" | "hpc";
 
 export type Packet = {
   no: number;
@@ -13,6 +13,6 @@ export type Packet = {
   error?: string;
 };
 
-export const LIDAR_IP = "192.168.10.11";
-export const STEER_IP = "192.168.10.12";
+export const IVI_IP = "192.168.10.11";
+export const HPC_IP = "192.168.10.12";
 export const SD_MCAST = "224.244.224.245";
